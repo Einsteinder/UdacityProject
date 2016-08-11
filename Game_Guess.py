@@ -70,18 +70,53 @@ def difficulty_choose():
 	else:
 		print "Wrong input, please choose again."
 		return difficulty_choose()
+
+def failure_time_choose():
+	#with this function we will ask the number of times that the user want to play
+	#output:game_over_time "number of lives"
+	game_over_times=raw_input("Please choose failure times on which you will lose(eg:1,2,3...): ")
+	return game_over_times
+	
+
+def show_and_split_question(question_string_local):
+	#with this function we will to show the user the questions and split them according line
+	#output:print the easy, medium or hard string
+	print "The current question is:\n"+question_string_local
+	question_string_local=re.split("\n",question_string_local)
+	return question_string_local
+
+def process_question(question_string_local):
+	word_lists_local=[]
+	#this function will put the splited string in a list
+	#output: return the list that contain the splited question.
+	for words in question_string_local:
+		word_lists_local.append(words.split())
+	return word_lists_local
+
+def won_condition(answer_local,user_input_local):
+	#this function estimate whether user won the game
+	#output:print the words of congratulation
+	if answer_local==user_input_local:
+		print "\nCongrats! You won!\n"
+		os._exit(1) 
+
+def fail_condition(count_local):
+	#this function estimate wheter user fail the game or fail to gusses
+	#output: print the result of guessing
+	if count_local==0:
+		print "\nYou've failed too many straight guesses!  Game over!\n"
+		os._exit(1) 
+	else:
+		print "\nYou are wrong, please try again, and you just have "+str(count_local)+" times!\n"
 		
-#Main program
-word_lists=[]
+
+	#Main program
+
 question_string,answer_list=difficulty_choose()
-game_over_times=raw_input("Please choose failure times on which you will lose(eg:1,2,3...): ")
-print "The current question is:\n"+question_string
+game_over_times=failure_time_choose()
+question_string=show_and_split_question(question_string)
+word_lists=process_question(question_string)
 
-question_string=re.split("\n",question_string)
-
-for words in question_string:
-	word_lists.append(words.split())
-#list of lists of words
 index=1
 count=int(game_over_times)
 
@@ -89,6 +124,7 @@ while count>0 and index<=5:
 	word_store_list2=[]
 	word_list_display=[]
 	word_store_list_1=[]
+	
 	blank="__"+str(index)+"__"
 	for word_list in word_lists:
 		replaced=[]
@@ -98,24 +134,14 @@ while count>0 and index<=5:
 				if answer_list[index-1]==user_input:
 					word=word.replace(blank,answer_list[index-1])
 					replaced.append(word)
-					if answer_list[4]==user_input:
-						print "\n"
-						print "Congrats! You won!\n"
-						os._exit(1) 
+					won_condition(answer_list[4],user_input)
 					index+=1
-					print '\n'
-					print "Correct!\n"
+					print "\nCorrect!\n"
 					
 				else:
 					count-=1
 					replaced.append(word)
-					if count==0:
-						print "\n"
-						print "You've failed too many straight guesses!  Game over!\n"
-						os._exit(1) 
-					else:
-						print "\n"
-						print "You are wrong, please try again, and you just have "+str(count)+" times!\n"
+					fail_condition(count)
 			else:
 				replaced.append(word)
 		word_store_list2.append(replaced)#[["aa","bb","cc","dd"]["ee","ff","gg"]]
